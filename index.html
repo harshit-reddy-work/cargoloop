@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CargoLoop — Logistics Platform</title>
+    <meta name="description" content="India's logistics platform for SMEs. Find trucks, post loads, reduce empty return trips.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <div id="app">
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                        <circle cx="16" cy="16" r="14" stroke="#4f46e5" stroke-width="2.5" fill="none"/>
+                        <path d="M10 20 L16 10 L22 20" stroke="#4f46e5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <path d="M12 17 H20" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h1>CargoLoop</h1>
+                    <span class="brand-tagline">Logistics Platform</span>
+                </div>
+            </div>
+            <div class="role-switcher" id="roleSwitcher">
+                <button class="role-btn active" data-role="shipper">Shipper</button>
+                <button class="role-btn" data-role="transporter">Transporter</button>
+                <button class="role-btn" data-role="admin">Admin</button>
+            </div>
+            <nav class="sidebar-nav" id="sidebarNav"></nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">RS</div>
+                    <div class="user-details">
+                        <span class="user-name">Rajesh Singh</span>
+                        <span class="user-role" id="userRoleLabel">Shipper</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header class="top-header">
+                <button class="menu-toggle" id="menuToggle">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+                <div class="header-search">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" placeholder="Search loads, trucks..." id="globalSearch">
+                </div>
+                <div class="header-actions">
+                    <button class="header-btn" id="notificationBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <span class="notification-badge">3</span>
+                    </button>
+                </div>
+            </header>
+            <div class="page-content" id="pageContent"></div>
+        </main>
+    </div>
+    <div class="modal-overlay" id="modalOverlay"><div class="modal-container" id="modalContainer"></div></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/data.js"></script>
+    <script src="js/matching.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/pages/dashboard.js"></script>
+    <script src="js/pages/postload.js"></script>
+    <script src="js/pages/findtruck.js"></script>
+    <script src="js/pages/findreturnload.js"></script>
+    <script src="js/pages/marketplace.js"></script>
+    <script src="js/pages/scheduling.js"></script>
+    <script src="js/pages/tracking.js"></script>
+    <script src="js/pages/pricing.js"></script>
+    <script src="js/pages/payments.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
