@@ -10,13 +10,10 @@ const App = {
                 { id: 'marketplace', label: 'Marketplace', icon: '🏪' },
                 { id: 'myloads', label: 'My Loads', icon: '📋' },
                 { id: 'postload', label: 'Post Load', icon: '📦' },
-                { id: 'findtruck', label: 'Find Truck', icon: '🔍' },
-                { id: 'findreturnload', label: 'Find Return Load', icon: '🔄' },
             ]},
             { section: 'Manage', items: [
                 { id: 'tracking', label: 'Track Shipment', icon: '📍' },
                 { id: 'scheduling', label: 'Scheduling', icon: '📅' },
-                { id: 'pricing', label: 'Pricing & Bids', icon: '💰' },
                 { id: 'payments', label: 'Payments', icon: '💳' },
             ]},
         ],
@@ -29,9 +26,7 @@ const App = {
             { section: 'Administration', items: [
                 { id: 'manageloads', label: 'Manage Loads', icon: '📦' },
                 { id: 'managetrucks', label: 'Manage Trucks', icon: '🚛' },
-                { id: 'findreturnload', label: 'Backhaul Matching', icon: '🔄' },
                 { id: 'scheduling', label: 'Scheduling', icon: '📅' },
-                { id: 'pricing', label: 'Pricing', icon: '💰' },
                 { id: 'payments', label: 'Payments', icon: '💳' },
             ]},
         ]
@@ -40,12 +35,9 @@ const App = {
     pages: {
         dashboard: { render: renderDashboard },
         postload: { render: renderPostLoad },
-        findtruck: { render: renderFindTruck },
-        findreturnload: { render: renderFindReturnLoad },
         marketplace: { render: renderMarketplace },
         scheduling: { render: renderScheduling },
         tracking: { render: renderTracking, init: initTrackingMap },
-        pricing: { render: renderPricing },
         payments: { render: renderPayments },
         myloads: { render: renderMyLoads },
         manageloads: { render: renderManageLoads },
@@ -80,7 +72,7 @@ const App = {
     updateUserUI(session) {
         document.getElementById('userName').textContent = session.displayName;
         document.getElementById('userRoleLabel').textContent = session.role === 'admin' ? 'Administrator' : 'User';
-        document.getElementById('userAvatar').textContent = session.role === 'admin' ? 'AD' : 'RS';
+        document.getElementById('userAvatar').textContent = (session.displayName || 'U').substring(0, 2).toUpperCase();
         document.getElementById('roleIcon').textContent = session.role === 'admin' ? '🛡️' : '👤';
         document.getElementById('roleLabel').textContent = session.role === 'admin' ? 'Admin Panel' : 'User Panel';
         document.getElementById('roleIndicator').className = 'role-indicator role-' + session.role;
