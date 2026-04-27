@@ -1,53 +1,38 @@
-// ===== Pricing Page (Simplified — No Chart.js) =====
+// ===== Pricing Page =====
 function renderPricing() {
+    const loads = DB.getCachedLoads();
     return `
     <div class="animate-fadeIn">
         <div class="page-header">
-            <div>
-                <h2>💰 Pricing & Bidding</h2>
-                <p>Get fair price estimates and place bids on loads</p>
-            </div>
+            <div><h2>💰 Pricing & Bidding</h2><p>Get fair price estimates and place bids on loads</p></div>
         </div>
-
         <div class="stat-grid mb-24">
             ${UI.statCard('💰', '₹48/km', 'Avg Market Rate', null, false, '#fef9c3')}
             ${UI.statCard('📊', '156', 'Active Bids', '12 new today', true, '#eef2ff')}
             ${UI.statCard('✅', '89%', 'Bid Acceptance Rate', null, false, '#dcfce7')}
         </div>
-
         <div class="grid-2 mb-24">
             <div class="card">
                 <h3 class="card-title mb-16">Price Calculator</h3>
                 <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Origin</label>
-                        <select class="form-select" id="priceOrigin">
-                            ${CITIES.map(c => `<option value="${c.name}" ${c.name==='Mumbai'?'selected':''}>${c.name}</option>`).join('')}
-                        </select>
+                    <div class="form-group"><label class="form-label">Origin</label>
+                        <select class="form-select" id="priceOrigin">${CITIES.map(c => `<option value="${c.name}" ${c.name==='Mumbai'?'selected':''}>${c.name}</option>`).join('')}</select>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Destination</label>
-                        <select class="form-select" id="priceDest">
-                            ${CITIES.map(c => `<option value="${c.name}" ${c.name==='Delhi'?'selected':''}>${c.name}</option>`).join('')}
-                        </select>
+                    <div class="form-group"><label class="form-label">Destination</label>
+                        <select class="form-select" id="priceDest">${CITIES.map(c => `<option value="${c.name}" ${c.name==='Delhi'?'selected':''}>${c.name}</option>`).join('')}</select>
                     </div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Weight (Tons)</label>
+                    <div class="form-group"><label class="form-label">Weight (Tons)</label>
                         <input type="number" class="form-input" id="priceWeight" value="8" min="1">
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Load Type</label>
-                        <select class="form-select" id="priceLoadType">
-                            ${LOAD_TYPES.map(t => `<option value="${t}">${t}</option>`).join('')}
-                        </select>
+                    <div class="form-group"><label class="form-label">Load Type</label>
+                        <select class="form-select" id="priceLoadType">${LOAD_TYPES.map(t => `<option value="${t}">${t}</option>`).join('')}</select>
                     </div>
                 </div>
                 <button class="btn btn-primary w-full" onclick="calcPrice()">Calculate Fair Price</button>
                 <div id="priceResult" class="mt-16"></div>
             </div>
-
             <div class="card">
                 <h3 class="card-title mb-16">Popular Route Rates</h3>
                 <div style="display:flex;flex-direction:column;gap:8px">
@@ -60,9 +45,7 @@ function renderPricing() {
                         { route: 'Kolkata → Guwahati', rate: '₹55/km', trend: '↑' },
                     ].map(r => `
                         <div class="avail-item">
-                            <div class="avail-info">
-                                <div class="name">${r.route}</div>
-                            </div>
+                            <div class="avail-info"><div class="name">${r.route}</div></div>
                             <span style="font-weight:700;font-size:0.85rem">${r.rate}</span>
                             <span style="font-size:0.8rem;color:${r.trend === '↑' ? 'var(--accent-red)' : r.trend === '↓' ? 'var(--accent-green)' : 'var(--text-muted)'}">${r.trend}</span>
                         </div>
@@ -70,16 +53,13 @@ function renderPricing() {
                 </div>
             </div>
         </div>
-
         <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Active Bids</h3>
-            </div>
+            <div class="card-header"><h3 class="card-title">Active Bids</h3></div>
             <div class="table-container">
                 <table class="data-table">
                     <thead><tr><th>Load</th><th>Route</th><th>Bids</th><th>Lowest Bid</th><th>Closes In</th><th>Action</th></tr></thead>
                     <tbody>
-                        ${MockData.loads.filter(l => l.bids > 0).slice(0, 8).map(l => `
+                        ${loads.filter(l => l.bids > 0).slice(0, 8).map(l => `
                             <tr>
                                 <td style="font-weight:600">${l.id}</td>
                                 <td>${l.origin} → ${l.destination}</td>

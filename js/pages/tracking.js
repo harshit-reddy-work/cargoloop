@@ -1,17 +1,14 @@
 // ===== Real-Time Tracking Page =====
 function renderTracking() {
-    const activeShipments = MockData.shipments.filter(s => s.status !== 'Completed' && s.status !== 'Pending');
+    const shipments = DB.getCachedShipments();
+    const activeShipments = shipments.filter(s => s.status !== 'Completed' && s.status !== 'Pending');
 
     return `
     <div class="animate-fadeIn">
         <div class="page-header">
-            <div>
-                <h2>📍 Real-Time Tracking</h2>
-                <p>Simulated GPS tracking of active shipments</p>
-            </div>
+            <div><h2>📍 Real-Time Tracking</h2><p>Simulated GPS tracking of active shipments</p></div>
             <span class="badge badge-cyan">${activeShipments.length} Active Shipments</span>
         </div>
-
         <div class="grid-2 mb-24" style="grid-template-columns:1fr 380px">
             <div class="card" style="padding:0;overflow:hidden">
                 <div class="map-container" id="trackingMap" style="height:500px"></div>
@@ -33,7 +30,6 @@ function renderTracking() {
                 `).join('')}
             </div>
         </div>
-
         <div class="card mb-24">
             <div class="card-header">
                 <h3 class="card-title">Shipment Timeline</h3>
@@ -51,24 +47,22 @@ function renderTracking() {
                         <div class="timeline-content">
                             <h4 style="${!isCompleted && !isActive ? 'opacity:0.4' : ''}">${status}</h4>
                             <p>${isCompleted ? 'Completed' : isActive ? 'In progress...' : 'Pending'}</p>
-                            ${isCompleted || isActive ? `<span class="time">${new Date(Date.now() - (currentIdx - i) * 3600000 * randInt(2,8)).toLocaleString()}</span>` : ''}
                         </div>
                     </div>`;
                 }).join('')}
             </div>
         </div>
-
         <div class="card">
             <div class="card-header"><h3 class="card-title">All Shipments</h3></div>
             <div class="table-container">
                 <table class="data-table">
-                    <thead><tr><th>ID</th><th>Route</th><th>Shipper</th><th>Transporter</th><th>Status</th><th>Progress</th><th>ETA</th></tr></thead>
+                    <thead><tr><th>ID</th><th>Route</th><th>Company</th><th>Transporter</th><th>Status</th><th>Progress</th><th>ETA</th></tr></thead>
                     <tbody>
-                        ${MockData.shipments.map(s => `
+                        ${shipments.map(s => `
                             <tr>
                                 <td style="font-weight:600">${s.id}</td>
                                 <td>${s.origin} → ${s.destination}</td>
-                                <td>${s.shipper}</td>
+                                <td>${s.company || s.shipper || '—'}</td>
                                 <td>${s.transporter}</td>
                                 <td><span class="badge badge-${getStatusColor(s.status)}">${s.status}</span></td>
                                 <td><div class="progress-bar" style="width:80px"><div class="progress-fill" style="width:${s.progress}%"></div></div></td>
@@ -88,14 +82,12 @@ function initTrackingMap() {
     try {
         const map = L.map(mapEl).setView([22, 78], 5);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '©CartoDB' }).addTo(map);
-
-        MockData.shipments.forEach(s => {
+        const shipments = DB.getCachedShipments();
+        shipments.forEach(s => {
             if (s.status === 'Completed' || s.status === 'Pending') return;
-            // Route line
             L.polyline([[s.originLat, s.originLng], [s.destLat, s.destLng]], {
                 color: '#6366f1', weight: 2, opacity: 0.3, dashArray: '5, 5'
             }).addTo(map);
-            // Current position
             const truckIcon = L.divIcon({
                 html: `<div style="width:24px;height:24px;background:#6366f1;border-radius:50%;border:3px solid white;box-shadow:0 0 10px rgba(99,102,241,0.5);display:flex;align-items:center;justify-content:center;font-size:10px">🚛</div>`,
                 iconSize: [24, 24], className: ''
@@ -109,7 +101,8 @@ function initTrackingMap() {
 }
 
 function focusShipment(idx) {
-    const s = MockData.shipments.filter(s => s.status !== 'Completed' && s.status !== 'Pending')[idx];
+    const shipments = DB.getCachedShipments().filter(s => s.status !== 'Completed' && s.status !== 'Pending');
+    const s = shipments[idx];
     if (s && window._trackingMap) {
         window._trackingMap.setView([s.currentLat, s.currentLng], 8);
     }

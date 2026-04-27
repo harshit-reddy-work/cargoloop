@@ -1,31 +1,19 @@
-// ===== CargoLoop Main App (Simplified) =====
+// ===== CargoLoop Main App =====
 const App = {
     currentPage: 'dashboard',
-    currentRole: 'shipper',
+    currentRole: 'user',
 
     navItems: {
-        shipper: [
+        user: [
             { section: 'Main', items: [
                 { id: 'dashboard', label: 'Dashboard', icon: '📊' },
                 { id: 'postload', label: 'Post Load', icon: '📦' },
                 { id: 'findtruck', label: 'Find Truck', icon: '🔍' },
-                { id: 'marketplace', label: 'Marketplace', icon: '🏪', badge: '12' },
-            ]},
-            { section: 'Manage', items: [
-                { id: 'tracking', label: 'Track Shipment', icon: '📍' },
-                { id: 'scheduling', label: 'Scheduling', icon: '📅' },
-                { id: 'pricing', label: 'Pricing & Bids', icon: '💰' },
-                { id: 'payments', label: 'Payments', icon: '💳' },
-            ]},
-        ],
-        transporter: [
-            { section: 'Main', items: [
-                { id: 'dashboard', label: 'Dashboard', icon: '📊' },
                 { id: 'findreturnload', label: 'Find Return Load', icon: '🔄', badge: '5' },
                 { id: 'marketplace', label: 'Marketplace', icon: '🏪', badge: '12' },
-                { id: 'tracking', label: 'Track Shipment', icon: '📍' },
             ]},
             { section: 'Manage', items: [
+                { id: 'tracking', label: 'Track Shipment', icon: '📍' },
                 { id: 'scheduling', label: 'Scheduling', icon: '📅' },
                 { id: 'pricing', label: 'Pricing & Bids', icon: '💰' },
                 { id: 'payments', label: 'Payments', icon: '💳' },
@@ -37,7 +25,9 @@ const App = {
                 { id: 'marketplace', label: 'Marketplace', icon: '🏪' },
                 { id: 'tracking', label: 'All Shipments', icon: '📍' },
             ]},
-            { section: 'Operations', items: [
+            { section: 'Administration', items: [
+                { id: 'manageloads', label: 'Manage Loads', icon: '📦' },
+                { id: 'managetrucks', label: 'Manage Trucks', icon: '🚛' },
                 { id: 'findreturnload', label: 'Backhaul Matching', icon: '🔄' },
                 { id: 'scheduling', label: 'Scheduling', icon: '📅' },
                 { id: 'pricing', label: 'Pricing', icon: '💰' },
@@ -56,13 +46,42 @@ const App = {
         tracking: { render: renderTracking, init: initTrackingMap },
         pricing: { render: renderPricing },
         payments: { render: renderPayments },
+        manageloads: { render: renderManageLoads },
+        managetrucks: { render: renderManageTrucks },
     },
 
-    init() {
+    async init() {
+        // Check authentication
+        if (!Auth.requireAuth()) return;
+
+        const session = Auth.getSession();
+        this.currentRole = session.role;
+
+        // Update UI with user info
+        this.updateUserUI(session);
+
+        // Initialize database — this is instant (local data loads synchronously)
+        DB.init();
+
+        // Hide loading overlay immediately
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.style.display = 'none', 300);
+        }
+
         this.renderSidebar();
-        this.setupRoleSwitcher();
         this.setupMenuToggle();
         this.navigate('dashboard');
+    },
+
+    updateUserUI(session) {
+        document.getElementById('userName').textContent = session.displayName;
+        document.getElementById('userRoleLabel').textContent = session.role === 'admin' ? 'Administrator' : 'User';
+        document.getElementById('userAvatar').textContent = session.role === 'admin' ? 'AD' : 'RS';
+        document.getElementById('roleIcon').textContent = session.role === 'admin' ? '🛡️' : '👤';
+        document.getElementById('roleLabel').textContent = session.role === 'admin' ? 'Admin Panel' : 'User Panel';
+        document.getElementById('roleIndicator').className = 'role-indicator role-' + session.role;
     },
 
     renderSidebar() {
@@ -93,21 +112,6 @@ const App = {
             setTimeout(() => this.pages[pageId].init(), 100);
         }
         document.getElementById('sidebar').classList.remove('open');
-    },
-
-    setupRoleSwitcher() {
-        document.querySelectorAll('.role-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                this.currentRole = btn.dataset.role;
-                document.getElementById('userRoleLabel').textContent =
-                    this.currentRole.charAt(0).toUpperCase() + this.currentRole.slice(1);
-                this.renderSidebar();
-                this.navigate('dashboard');
-                UI.toast(`Switched to ${this.currentRole} view`, 'info');
-            });
-        });
     },
 
     setupMenuToggle() {

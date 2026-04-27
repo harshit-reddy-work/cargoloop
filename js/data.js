@@ -1,4 +1,4 @@
-// ===== CargoLoop Mock Data =====
+// ===== CargoLoop Seed Data & Helpers =====
 const CITIES = [
     { name: 'Mumbai', state: 'Maharashtra', lat: 19.076, lng: 72.8777, hub: true },
     { name: 'Delhi', state: 'Delhi', lat: 28.7041, lng: 77.1025, hub: true },
@@ -32,8 +32,7 @@ const TRUCK_TYPES = ['Open Body', 'Closed Container', 'Flatbed', 'Refrigerated',
 const VEHICLE_MAKES = ['Tata', 'Ashok Leyland', 'Mahindra', 'Eicher', 'BharatBenz', 'Volvo', 'Isuzu'];
 
 const STATUS_FLOW = ['Pending', 'Matched', 'Picked Up', 'In Transit', 'Delivered', 'Return Assigned', 'Return In Transit', 'Completed'];
-const SHIPPER_NAMES = ['Rajesh Textiles', 'Om Electronics', 'Gupta Auto Parts', 'Krishna FMCG', 'Patel Pharma', 'Sharma Chemicals', 'Singh Construction', 'Agrawal Foods', 'Mehta Exports', 'Joshi Industries', 'Verma Plastics', 'Nair Spices', 'Reddy Agro', 'Kumar Metals', 'Bansal Traders'];
-const TRANSPORTER_NAMES = ['Sai Transport', 'Om Logistics', 'VRL Logistics', 'Gati Express', 'Delhivery Freight', 'Rivigo Fleet', 'TCI Freight', 'Shree Maruti', 'Navata Road Transport', 'Blue Dart Express', 'SRS Transport', 'Agarwal Packers'];
+const COMPANY_NAMES = ['Rajesh Textiles', 'Om Electronics', 'Gupta Auto Parts', 'Krishna FMCG', 'Patel Pharma', 'Sharma Chemicals', 'Singh Construction', 'Agrawal Foods', 'Mehta Exports', 'Joshi Industries', 'Verma Plastics', 'Nair Spices', 'Reddy Agro', 'Kumar Metals', 'Bansal Traders', 'Sai Transport', 'Om Logistics', 'VRL Logistics', 'Gati Express', 'Delhivery Freight', 'Rivigo Fleet', 'TCI Freight', 'Shree Maruti', 'Navata Road Transport', 'Blue Dart Express', 'SRS Transport', 'Agarwal Packers'];
 
 function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 function randItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
@@ -60,7 +59,7 @@ function generateLoads(count) {
         baseDate.setDate(baseDate.getDate() + randInt(-3, 14));
         loads.push({
             id: 'LD' + String(i + 1001).padStart(5, '0'),
-            shipper: randItem(SHIPPER_NAMES),
+            company: randItem(COMPANY_NAMES),
             origin: origin.name,
             originState: origin.state,
             originLat: origin.lat,
@@ -97,7 +96,7 @@ function generateTrucks(count) {
         const capacity = randItem([1, 2, 3, 5, 7, 9, 14, 16, 20, 25]);
         trucks.push({
             id: 'TK' + String(i + 2001).padStart(5, '0'),
-            owner: randItem(TRANSPORTER_NAMES),
+            owner: randItem(COMPANY_NAMES),
             driverName: randItem(['Ramesh', 'Suresh', 'Manoj', 'Vijay', 'Raju', 'Sanjay', 'Deepak', 'Arun', 'Kiran', 'Prakash']) + ' ' + randItem(['Kumar', 'Singh', 'Sharma', 'Verma', 'Yadav', 'Patel']),
             vehicleNumber: randItem(['MH', 'DL', 'KA', 'TN', 'GJ', 'RJ', 'UP', 'WB', 'AP', 'TS']) + randInt(1, 50) + ' ' + String.fromCharCode(65 + randInt(0, 25)) + String.fromCharCode(65 + randInt(0, 25)) + ' ' + randInt(1000, 9999),
             truckType: randItem(TRUCK_TYPES),
@@ -141,8 +140,8 @@ function generateShipments() {
             status: status,
             progress: progressMap[status],
             distance: distance,
-            shipper: randItem(SHIPPER_NAMES),
-            transporter: randItem(TRANSPORTER_NAMES),
+            company: randItem(COMPANY_NAMES),
+            transporter: randItem(COMPANY_NAMES),
             loadType: randItem(LOAD_TYPES),
             weight: randInt(2, 20),
             price: distance * randInt(40, 70),
@@ -152,16 +151,8 @@ function generateShipments() {
     return shipments;
 }
 
-// Generate data
-const MockData = {
-    cities: CITIES,
-    loads: generateLoads(60),
-    trucks: generateTrucks(45),
-    shipments: generateShipments(),
-    loadTypes: LOAD_TYPES,
-    truckTypes: TRUCK_TYPES,
-    
-    analytics: {
+function generateAnalytics() {
+    return {
         totalLoads: 1247,
         totalTrucks: 489,
         emptyKmReduced: 34500,
@@ -193,23 +184,21 @@ const MockData = {
             { hour: '6AM', demand: 30 }, { hour: '8AM', demand: 55 }, { hour: '10AM', demand: 85 },
             { hour: '12PM', demand: 72 }, { hour: '2PM', demand: 68 }, { hour: '4PM', demand: 60 },
             { hour: '6PM', demand: 45 }, { hour: '8PM', demand: 25 }, { hour: '10PM', demand: 15 },
+        ],
+        pricingHistory: {
+            'Mumbai-Delhi': [52, 55, 48, 53, 58, 61, 56, 54, 59, 62, 57, 55],
+            'Delhi-Bangalore': [68, 65, 70, 72, 67, 63, 69, 74, 71, 66, 68, 70],
+            'Chennai-Hyderabad': [42, 45, 40, 43, 47, 44, 41, 46, 48, 43, 45, 42],
+        },
+        notifications: [
+            { id: 1, type: 'match', msg: 'New backhaul match found: Delhi → Jaipur', time: '2 min ago', read: false },
+            { id: 2, type: 'bid', msg: 'New bid received on Load #LD01005 - ₹18,500', time: '15 min ago', read: false },
+            { id: 3, type: 'delivery', msg: 'Shipment SH03004 delivered successfully', time: '1 hr ago', read: false },
+            { id: 4, type: 'alert', msg: 'Truck TK02012 delayed by 3 hours', time: '2 hrs ago', read: true },
+            { id: 5, type: 'system', msg: 'Weekly analytics report ready', time: '5 hrs ago', read: true },
         ]
-    },
-
-    pricingHistory: {
-        'Mumbai-Delhi': [52, 55, 48, 53, 58, 61, 56, 54, 59, 62, 57, 55],
-        'Delhi-Bangalore': [68, 65, 70, 72, 67, 63, 69, 74, 71, 66, 68, 70],
-        'Chennai-Hyderabad': [42, 45, 40, 43, 47, 44, 41, 46, 48, 43, 45, 42],
-    },
-
-    notifications: [
-        { id: 1, type: 'match', msg: 'New backhaul match found: Delhi → Jaipur', time: '2 min ago', read: false },
-        { id: 2, type: 'bid', msg: 'New bid received on Load #LD01005 - ₹18,500', time: '15 min ago', read: false },
-        { id: 3, type: 'delivery', msg: 'Shipment SH03004 delivered successfully', time: '1 hr ago', read: false },
-        { id: 4, type: 'alert', msg: 'Truck TK02012 delayed by 3 hours', time: '2 hrs ago', read: true },
-        { id: 5, type: 'system', msg: 'Weekly analytics report ready', time: '5 hrs ago', read: true },
-    ]
-};
+    };
+}
 
 // Helper functions
 function formatCurrency(amount) {

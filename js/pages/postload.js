@@ -1,4 +1,4 @@
-// ===== Post Load Page (Simplified) =====
+// ===== Post Load Page =====
 function renderPostLoad() {
     return `
     <div class="animate-fadeIn">
@@ -63,6 +63,10 @@ function renderPostLoad() {
                     </div>
                 </div>
                 <div class="form-group">
+                    <label class="form-label">Company Name</label>
+                    <input type="text" class="form-input" id="postCompany" placeholder="Your company name">
+                </div>
+                <div class="form-group">
                     <label class="form-label">Pricing Model</label>
                     <select class="form-select" id="postPricingModel">
                         <option value="fixed">Fixed Price</option>
@@ -103,7 +107,12 @@ function renderPostLoad() {
                 <div class="card">
                     <h3 class="card-title mb-16">🔥 High Demand Routes</h3>
                     <div style="display:flex;flex-direction:column;gap:6px">
-                        ${MockData.analytics.routeHotspots.slice(0, 4).map(r => `
+                        ${[
+                            { route: 'Mumbai → Delhi', demand: 95 },
+                            { route: 'Delhi → Jaipur', demand: 82 },
+                            { route: 'Bangalore → Chennai', demand: 78 },
+                            { route: 'Ahmedabad → Mumbai', demand: 88 },
+                        ].map(r => `
                             <div class="avail-item">
                                 <div class="avail-info">
                                     <div class="name">${r.route}</div>
@@ -153,10 +162,47 @@ function getAIPrice() {
     document.getElementById('postBudget').value = s.suggested;
 }
 
-function submitLoad() {
+async function submitLoad() {
     const origin = document.getElementById('postOrigin').value;
     const dest = document.getElementById('postDest').value;
     if (!origin || !dest) { UI.toast('Please fill origin and destination', 'error'); return; }
-    UI.toast('Load posted successfully! ID: LD' + randInt(10000, 99999), 'success');
-    setTimeout(() => App.navigate('marketplace'), 1000);
+
+    const originCity = CITIES.find(c => c.name === origin);
+    const destCity = CITIES.find(c => c.name === dest);
+    const weight = parseInt(document.getElementById('postWeight').value) || 5;
+    const distance = calcDistance(originCity, destCity);
+    const price = parseInt(document.getElementById('postBudget').value) || (distance * randInt(35, 85));
+
+    const load = {
+        company: document.getElementById('postCompany').value || 'Unknown Company',
+        origin: origin,
+        originState: originCity.state,
+        originLat: originCity.lat,
+        originLng: originCity.lng,
+        destination: dest,
+        destState: destCity.state,
+        destLat: destCity.lat,
+        destLng: destCity.lng,
+        weight: weight,
+        loadType: document.getElementById('postLoadType').value,
+        truckTypeRequired: document.getElementById('postTruckType').value,
+        distance: distance,
+        price: price,
+        pricePerKm: Math.round(price / distance),
+        pickupDate: document.getElementById('postPickup').value,
+        deliveryDate: document.getElementById('postDelivery').value,
+        status: 'Pending',
+        isBackhaul: false,
+        poolable: weight < 10,
+        bids: 0,
+        urgent: false
+    };
+
+    try {
+        const saved = await DB.addLoad(load);
+        UI.toast(`Load posted successfully! ID: ${saved.id} 🎉`, 'success');
+        setTimeout(() => App.navigate('marketplace'), 1000);
+    } catch (e) {
+        UI.toast('Error posting load: ' + e.message, 'error');
+    }
 }

@@ -1,9 +1,16 @@
-// ===== Dashboard Page (Simplified) =====
+// ===== Dashboard Page =====
 function renderDashboard() {
-    const pendingLoads = MockData.loads.filter(l => l.status === 'Pending');
-    const availTrucks = MockData.trucks.filter(t => t.status === 'Available');
-    const inTransit = MockData.shipments.filter(s => s.status === 'In Transit');
-    const delivered = MockData.shipments.filter(s => s.status === 'Delivered' || s.status === 'Completed');
+    const loads = DB.getCachedLoads();
+    const trucks = DB.getCachedTrucks();
+    const shipments = DB.getCachedShipments();
+    
+    const pendingLoads = loads.filter(l => l.status === 'Pending');
+    const availTrucks = trucks.filter(t => t.status === 'Available');
+    const inTransit = shipments.filter(s => s.status === 'In Transit');
+    const delivered = shipments.filter(s => s.status === 'Delivered' || s.status === 'Completed');
+
+    const session = Auth.getSession();
+    const isAdmin = Auth.isAdmin();
 
     // Recent activities
     const activities = [
@@ -14,7 +21,7 @@ function renderDashboard() {
         { dot: 'blue', text: 'Truck TK02018 now available in Pune', time: '1.5 hrs ago' },
         { dot: 'green', text: 'Return load assigned: Delhi → Jaipur', time: '2 hrs ago' },
         { dot: 'red', text: 'Shipment SH03009 delayed by 2 hours', time: '3 hrs ago' },
-        { dot: 'blue', text: 'New transporter registered: Sai Transport', time: '4 hrs ago' },
+        { dot: 'blue', text: 'New user registered: Sai Transport', time: '4 hrs ago' },
     ];
 
     return `
@@ -22,9 +29,15 @@ function renderDashboard() {
         <div class="page-header">
             <div>
                 <h2>Dashboard</h2>
-                <p>Welcome back, Rajesh! Here's what's happening today.</p>
+                <p>Welcome back, ${session ? session.displayName : 'User'}! Here's what's happening today.</p>
             </div>
-            <button class="btn btn-primary" onclick="App.navigate('postload')">+ Post Load</button>
+            ${isAdmin 
+                ? `<div class="flex gap-8">
+                    <button class="btn btn-secondary" onclick="App.navigate('manageloads')">📦 Manage Loads</button>
+                    <button class="btn btn-secondary" onclick="App.navigate('managetrucks')">🚛 Manage Trucks</button>
+                </div>`
+                : `<button class="btn btn-primary" onclick="App.navigate('postload')">+ Post Load</button>`
+            }
         </div>
 
         <div class="stat-grid">
@@ -51,6 +64,7 @@ function renderDashboard() {
                             <span class="badge badge-green">Available</span>
                         </div>
                     `).join('')}
+                    ${availTrucks.length === 0 ? '<div class="empty-state"><p>No available trucks</p></div>' : ''}
                 </div>
             </div>
 
@@ -89,6 +103,7 @@ function renderDashboard() {
                             <button class="btn btn-primary btn-sm" onclick="App.navigate('findtruck')">Match</button>
                         </div>
                     `).join('')}
+                    ${pendingLoads.length === 0 ? '<div class="empty-state"><p>No pending loads</p></div>' : ''}
                 </div>
             </div>
 
@@ -98,7 +113,7 @@ function renderDashboard() {
                     <button class="btn btn-ghost btn-sm" onclick="App.navigate('tracking')">Track All →</button>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:8px">
-                    ${MockData.shipments.filter(s => s.status !== 'Pending' && s.status !== 'Completed').slice(0, 5).map(s => `
+                    ${shipments.filter(s => s.status !== 'Pending' && s.status !== 'Completed').slice(0, 5).map(s => `
                         <div class="avail-item">
                             <div class="avail-icon" style="background:${s.status === 'Delivered' ? '#dcfce7' : '#e0f2fe'}">
                                 ${s.status === 'Delivered' ? '✅' : '🔄'}
@@ -110,6 +125,7 @@ function renderDashboard() {
                             <span class="badge badge-${getStatusColor(s.status)}">${s.status}</span>
                         </div>
                     `).join('')}
+                    ${shipments.length === 0 ? '<div class="empty-state"><p>No shipments yet</p></div>' : ''}
                 </div>
             </div>
         </div>

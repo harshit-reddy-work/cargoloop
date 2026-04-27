@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CargoLoop — Login</title>
+    <meta name="description" content="Login to CargoLoop Logistics Platform.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --font-family: 'Inter', -apple-system, sans-serif; --accent: #4f46e5; --accent-hover: #4338ca; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-family); min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 40%, #312e81 70%, #1e1b4b 100%);
+            overflow: hidden; position: relative;
+        }
+        .bg-particles { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+        .bg-particles::before, .bg-particles::after {
+            content: ''; position: absolute; border-radius: 50%;
+            filter: blur(80px); opacity: 0.3; animation: floatP 15s ease-in-out infinite;
+        }
+        .bg-particles::before { width: 500px; height: 500px; background: radial-gradient(circle, #6366f1, transparent); top: -10%; left: -10%; }
+        .bg-particles::after { width: 400px; height: 400px; background: radial-gradient(circle, #0ea5e9, transparent); bottom: -10%; right: -10%; animation-delay: -7s; animation-direction: reverse; }
+        @keyframes floatP { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(80px, -60px) scale(1.1); } 66% { transform: translate(-40px, 40px) scale(0.9); } }
+        .grid-overlay { position: fixed; inset: 0; background-image: linear-gradient(rgba(99,102,241,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.03) 1px, transparent 1px); background-size: 60px 60px; z-index: 0; }
+        .login-container { position: relative; z-index: 1; width: 100%; max-width: 440px; padding: 20px; }
+        .login-brand { text-align: center; margin-bottom: 32px; }
+        .login-brand-icon { display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 18px; background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3); margin-bottom: 16px; backdrop-filter: blur(10px); }
+        .login-brand h1 { font-size: 2rem; font-weight: 900; color: white; letter-spacing: -1px; }
+        .login-brand p { font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 4px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; }
+        .login-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 36px 32px; backdrop-filter: blur(20px); box-shadow: 0 20px 60px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05) inset; }
+        .mode-tabs { display: flex; gap: 4px; background: rgba(255,255,255,0.06); padding: 4px; border-radius: 12px; margin-bottom: 24px; }
+        .mode-tab { flex: 1; padding: 10px; border: none; background: transparent; color: rgba(255,255,255,0.45); font-family: var(--font-family); font-size: 0.85rem; font-weight: 600; border-radius: 9px; cursor: pointer; transition: all 0.25s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .mode-tab.active { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(79,70,229,0.4); }
+        .mode-tab:hover:not(.active) { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); }
+        .login-tabs { display: flex; gap: 4px; background: rgba(255,255,255,0.06); padding: 4px; border-radius: 12px; margin-bottom: 20px; }
+        .login-tab { flex: 1; padding: 8px; border: none; background: transparent; color: rgba(255,255,255,0.45); font-family: var(--font-family); font-size: 0.78rem; font-weight: 600; border-radius: 7px; cursor: pointer; transition: all 0.25s; }
+        .login-tab.active { background: rgba(255,255,255,0.12); color: white; }
+        .login-tab:hover:not(.active) { color: rgba(255,255,255,0.7); }
+        .form-field { margin-bottom: 18px; }
+        .form-field label { display: block; font-size: 0.72rem; font-weight: 600; color: rgba(255,255,255,0.55); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-wrapper { position: relative; }
+        .input-wrapper svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: rgba(255,255,255,0.3); pointer-events: none; }
+        .form-field input { width: 100%; padding: 12px 14px 12px 44px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: white; font-family: var(--font-family); font-size: 0.9rem; outline: none; transition: all 0.25s; }
+        .form-field input::placeholder { color: rgba(255,255,255,0.25); }
+        .form-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,70,229,0.2); background: rgba(255,255,255,0.08); }
+        .login-btn { width: 100%; padding: 13px; background: var(--accent); color: white; border: none; border-radius: 12px; font-family: var(--font-family); font-size: 0.92rem; font-weight: 700; cursor: pointer; transition: all 0.25s; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .login-btn:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 8px 25px rgba(79,70,229,0.4); }
+        .login-btn.loading { pointer-events: none; opacity: 0.8; }
+        .login-btn .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; display: none; }
+        .login-btn.loading .spinner { display: block; }
+        .login-btn.loading .btn-text { display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .signup-btn { width: 100%; padding: 13px; background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; font-family: var(--font-family); font-size: 0.92rem; font-weight: 700; cursor: pointer; transition: all 0.25s; margin-top: 4px; }
+        .signup-btn:hover { background: rgba(16,185,129,0.3); transform: translateY(-1px); }
+        .login-error { background: rgba(220,38,38,0.15); border: 1px solid rgba(220,38,38,0.3); color: #fca5a5; padding: 10px 14px; border-radius: 10px; font-size: 0.82rem; font-weight: 500; margin-bottom: 14px; display: none; align-items: center; gap: 8px; animation: shake 0.4s ease; }
+        .login-error.show { display: flex; }
+        .login-success { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #6ee7b7; padding: 10px 14px; border-radius: 10px; font-size: 0.82rem; font-weight: 500; margin-bottom: 14px; display: none; align-items: center; gap: 8px; }
+        .login-success.show { display: flex; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 50% { transform: translateX(8px); } 75% { transform: translateX(-4px); } }
+        .login-hint { margin-top: 16px; text-align: center; font-size: 0.72rem; color: rgba(255,255,255,0.3); }
+        .login-hint code { background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 6px; font-family: 'Courier New', monospace; color: rgba(255,255,255,0.5); }
+        .login-footer { text-align: center; margin-top: 24px; color: rgba(255,255,255,0.3); font-size: 0.72rem; }
+        .form-panel { display: none; } .form-panel.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="bg-particles"></div>
+    <div class="grid-overlay"></div>
+    <div class="login-container">
+        <div class="login-brand">
+            <div class="login-brand-icon">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <circle cx="16" cy="16" r="14" stroke="#818cf8" stroke-width="2.5" fill="none"/>
+                    <path d="M10 20 L16 10 L22 20" stroke="#818cf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <path d="M12 17 H20" stroke="#818cf8" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h1>CargoLoop</h1>
+            <p>Logistics Platform</p>
+        </div>
+
+        <div class="login-card">
+            <!-- Sign In / Sign Up Toggle -->
+            <div class="mode-tabs">
+                <button class="mode-tab active" onclick="switchMode('signin')" id="modeSignin">🔑 Sign In</button>
+                <button class="mode-tab" onclick="switchMode('signup')" id="modeSignup">📝 Sign Up</button>
+            </div>
+
+            <!-- Error / Success Messages -->
+            <div class="login-error" id="loginError"><span>✕</span> <span id="errorMsg">Invalid credentials</span></div>
+            <div class="login-success" id="loginSuccess"><span>✓</span> <span id="successMsg">Account created!</span></div>
+
+            <!-- SIGN IN PANEL -->
+            <div class="form-panel active" id="signinPanel">
+                <div class="login-tabs">
+                    <button class="login-tab active" onclick="switchRole('admin')" id="tabAdmin">🛡️ Admin</button>
+                    <button class="login-tab" onclick="switchRole('user')" id="tabUser">👤 User</button>
+                </div>
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-field">
+                        <label>Username</label>
+                        <div class="input-wrapper">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <input type="text" id="loginUsername" placeholder="Enter username" autocomplete="username" required>
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>Password</label>
+                        <div class="input-wrapper">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="login-btn" id="loginBtn">
+                        <span class="spinner"></span><span class="btn-text">Sign In</span>
+                    </button>
+                </form>
+                <div class="login-hint" id="loginHint">Demo: <code>admin</code> / <code>admin123</code> or <code>user</code> / <code>user123</code></div>
+            </div>
+
+            <!-- SIGN UP PANEL -->
+            <div class="form-panel" id="signupPanel">
+                <form onsubmit="handleSignup(event)">
+                    <div class="form-field">
+                        <label>Display Name</label>
+                        <div class="input-wrapper">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <input type="text" id="signupName" placeholder="Your full name" required>
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>Username</label>
+                        <div class="input-wrapper">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+                            <input type="text" id="signupUsername" placeholder="Choose a username" required>
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>Password</label>
+                        <div class="input-wrapper">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <input type="password" id="signupPassword" placeholder="Create a password" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="signup-btn">📝 Create Account</button>
+                </form>
+                <div class="login-hint">You'll be logged in as a <strong style="color:rgba(255,255,255,0.6)">User</strong> after signup</div>
+            </div>
+        </div>
+        <div class="login-footer">© 2026 CargoLoop — Reducing Empty Kilometers Across India</div>
+    </div>
+
+    <script>
+        // Supabase config
+        const SB_URL = 'https://dncofxskhacrbupoxumy.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRuY29meHNraGFjcmJ1cG94dW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyOTc4MjMsImV4cCI6MjA5Mjg3MzgyM30.mj8P6yX-WRBE7SILFwIL9_T8f2NE9sYouYpp6xbeAAs';
+        const SB_H = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
+
+        // Redirect if already logged in
+        (function() { try { if (localStorage.getItem('cargoloop_auth')) window.location.href = 'index.html'; } catch(e) {} })();
+
+        let selectedRole = 'admin';
+
+        function switchMode(mode) {
+            document.getElementById('modeSignin').classList.toggle('active', mode === 'signin');
+            document.getElementById('modeSignup').classList.toggle('active', mode === 'signup');
+            document.getElementById('signinPanel').classList.toggle('active', mode === 'signin');
+            document.getElementById('signupPanel').classList.toggle('active', mode === 'signup');
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('loginSuccess').classList.remove('show');
+        }
+
+        function switchRole(role) {
+            selectedRole = role;
+            document.getElementById('tabAdmin').classList.toggle('active', role === 'admin');
+            document.getElementById('tabUser').classList.toggle('active', role === 'user');
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errEl = document.getElementById('loginError');
+            const btn = document.getElementById('loginBtn');
+            if (!username || !password) { errEl.classList.add('show'); document.getElementById('errorMsg').textContent = 'Please fill in all fields'; return; }
+            btn.classList.add('loading');
+            errEl.classList.remove('show');
+
+            try {
+                // Check Supabase users table
+                const res = await fetch(`${SB_URL}/rest/v1/users?username=eq.${encodeURIComponent(username)}&password=eq.${encodeURIComponent(password)}&select=*`, { headers: SB_H });
+                if (res.ok) {
+                    const users = await res.json();
+                    if (users.length > 0) {
+                        const u = users[0];
+                        localStorage.setItem('cargoloop_auth', JSON.stringify({ role: u.role, username: u.username, displayName: u.displayName, loginTime: Date.now() }));
+                        window.location.href = 'index.html';
+                        return;
+                    }
+                }
+            } catch (e) { console.warn('Supabase login failed, trying local:', e); }
+
+            // Fallback to local
+            let localUsers;
+            try { localUsers = JSON.parse(localStorage.getItem('cargoloop_users')); } catch(e) {}
+            if (!localUsers) localUsers = [{ username: 'admin', password: 'admin123', role: 'admin', displayName: 'Admin Panel' }, { username: 'user', password: 'user123', role: 'user', displayName: 'Rajesh Singh' }];
+            const user = localUsers.find(u => u.username === username && u.password === password);
+            if (user) {
+                localStorage.setItem('cargoloop_auth', JSON.stringify({ role: user.role, username: user.username, displayName: user.displayName, loginTime: Date.now() }));
+                window.location.href = 'index.html';
+            } else {
+                btn.classList.remove('loading');
+                errEl.classList.add('show');
+                document.getElementById('errorMsg').textContent = 'Invalid username or password';
+            }
+        }
+
+        async function handleSignup(e) {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value.trim();
+            const username = document.getElementById('signupUsername').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const errEl = document.getElementById('loginError');
+            const successEl = document.getElementById('loginSuccess');
+            errEl.classList.remove('show');
+            successEl.classList.remove('show');
+
+            if (!name || !username || !password) { errEl.classList.add('show'); document.getElementById('errorMsg').textContent = 'Please fill in all fields'; return; }
+            if (username.length < 3) { errEl.classList.add('show'); document.getElementById('errorMsg').textContent = 'Username must be at least 3 characters'; return; }
+            if (password.length < 4) { errEl.classList.add('show'); document.getElementById('errorMsg').textContent = 'Password must be at least 4 characters'; return; }
+
+            try {
+                // Check if username exists
+                const checkRes = await fetch(`${SB_URL}/rest/v1/users?username=eq.${encodeURIComponent(username)}&select=id`, { headers: SB_H });
+                if (checkRes.ok) {
+                    const existing = await checkRes.json();
+                    if (existing.length > 0) {
+                        errEl.classList.add('show');
+                        document.getElementById('errorMsg').textContent = 'Username already taken. Try another.';
+                        return;
+                    }
+                }
+                // Insert new user into Supabase
+                const insertRes = await fetch(`${SB_URL}/rest/v1/users`, {
+                    method: 'POST', headers: SB_H,
+                    body: JSON.stringify({ username, password, role: 'user', displayName: name, createdAt: new Date().toISOString() })
+                });
+                if (insertRes.ok) {
+                    localStorage.setItem('cargoloop_auth', JSON.stringify({ role: 'user', username, displayName: name, loginTime: Date.now() }));
+                    successEl.classList.add('show');
+                    document.getElementById('successMsg').textContent = 'Account created! Redirecting...';
+                    setTimeout(() => { window.location.href = 'index.html'; }, 800);
+                    return;
+                }
+            } catch (e) { console.warn('Supabase signup failed:', e); }
+
+            // Fallback to local
+            errEl.classList.add('show');
+            document.getElementById('errorMsg').textContent = 'Signup failed. Please try again.';
+        }
+    </script>
+</body>
+</html>
