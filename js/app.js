@@ -7,10 +7,11 @@ const App = {
         user: [
             { section: 'Main', items: [
                 { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+                { id: 'marketplace', label: 'Marketplace', icon: '🏪' },
+                { id: 'myloads', label: 'My Loads', icon: '📋' },
                 { id: 'postload', label: 'Post Load', icon: '📦' },
                 { id: 'findtruck', label: 'Find Truck', icon: '🔍' },
-                { id: 'findreturnload', label: 'Find Return Load', icon: '🔄', badge: '5' },
-                { id: 'marketplace', label: 'Marketplace', icon: '🏪', badge: '12' },
+                { id: 'findreturnload', label: 'Find Return Load', icon: '🔄' },
             ]},
             { section: 'Manage', items: [
                 { id: 'tracking', label: 'Track Shipment', icon: '📍' },
@@ -46,6 +47,7 @@ const App = {
         tracking: { render: renderTracking, init: initTrackingMap },
         pricing: { render: renderPricing },
         payments: { render: renderPayments },
+        myloads: { render: renderMyLoads },
         manageloads: { render: renderManageLoads },
         managetrucks: { render: renderManageTrucks },
     },

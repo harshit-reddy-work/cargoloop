@@ -195,7 +195,9 @@ async function submitLoad() {
         isBackhaul: false,
         poolable: weight < 10,
         bids: 0,
-        urgent: false
+        urgent: false,
+        postedBy: Auth.getSession()?.username || '',
+        bidders: []
     };
 
     try {
